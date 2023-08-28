@@ -20,11 +20,8 @@ public class CrackerController {
 
     @GetMapping("/crack")
     public String crack(@RequestParam String url, @RequestParam String username) {
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(username, "abc");
-
-        return restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), String.class).getBody();
+        //Call login service with username and password
+        return null;
     }
 
 }
