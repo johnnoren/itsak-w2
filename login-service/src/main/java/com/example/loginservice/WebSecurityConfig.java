@@ -27,10 +27,8 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
             throws Exception {
         http.authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/user").hasAnyRole("USER", "ADMIN"))
-                .httpBasic(withDefaults())
-                .formLogin(withDefaults())
-                .logout(withDefaults());
+                        .requestMatchers("/**").permitAll());
+        http.csrf().disable();
         return http.build();
     }
 
