@@ -4,10 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -27,11 +24,11 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
-        if (passwordEncoder.matches(password, correctPassword)) {
-            return new ResponseEntity<>("Login successful for " + username, HttpStatus.OK);
+    public ResponseEntity<String> login(@RequestBody User user) {
+        if (passwordEncoder.matches(user.getPassword(), correctPassword)) {
+            return new ResponseEntity<>("Login successful for " + user.getUsername(), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("Validation failed for " + username, HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("Validation failed for " + user.getUsername(), HttpStatus.FORBIDDEN);
         }
     }
 }
