@@ -21,7 +21,6 @@ public class CrackerController {
     @GetMapping("/crack")
     public String crack(@RequestParam String url, @RequestParam String username) {
 
-
         HttpHeaders headers = new HttpHeaders();
         headers.setBasicAuth(username, "abc");
 
