@@ -3,6 +3,8 @@
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/login-service" />
+    <file type="web" url="file://$PROJECT_DIR$/password-cracker" />
+    <file type="web" url="file://$PROJECT_DIR$/pw-cracker" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="17" project-jdk-type="JavaSDK" />
 </project>

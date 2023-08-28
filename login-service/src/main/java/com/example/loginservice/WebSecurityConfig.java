@@ -30,11 +30,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/user").hasAnyRole("USER", "ADMIN"))
                 .httpBasic(withDefaults())
                 .formLogin(withDefaults())
-                .logout((logout) ->
-                        logout.deleteCookies("remove")
-                                .invalidateHttpSession(false)
-
-                );
+                .logout(withDefaults());
         return http.build();
     }
 
