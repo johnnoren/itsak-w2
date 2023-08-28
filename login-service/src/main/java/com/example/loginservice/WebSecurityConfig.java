@@ -27,22 +27,8 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
             throws Exception {
         http.authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/**").permitAll());
+                .requestMatchers("/**").permitAll());
         http.csrf().disable();
         return http.build();
-    }
-
-    @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-
-        UserDetails user = User.withUsername("user")
-                .password(passwordEncoder().encode("abc"))
-                .roles("USER")
-                .build();
-        UserDetails admin = User.withUsername("admin")
-                .password(passwordEncoder().encode("123"))
-                .roles("USER", "ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(user, admin);
     }
 }
