@@ -12,6 +12,7 @@ public class LoginController {
 
     private final String correctPassword;
     private final PasswordEncoder passwordEncoder;
+    private final String unencryptedPassword = "abc";
 
     public LoginController() {
         this.passwordEncoder = new BCryptPasswordEncoder();
@@ -26,6 +27,16 @@ public class LoginController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody User user) {
         if (passwordEncoder.matches(user.getPassword(), correctPassword)) {
+            return new ResponseEntity<>("Login successful for " + user.getUsername(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Validation failed for " + user.getUsername(), HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @PostMapping("/nocrypt")
+    public ResponseEntity<String> noEncryption(@RequestBody User user) {
+        System.out.println(user);
+        if (unencryptedPassword.equals(user.getPassword())) {
             return new ResponseEntity<>("Login successful for " + user.getUsername(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Validation failed for " + user.getUsername(), HttpStatus.FORBIDDEN);
