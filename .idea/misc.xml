@@ -4,6 +4,7 @@
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/javacracker" />
     <file type="web" url="file://$PROJECT_DIR$/login-service" />
+    <file type="web" url="file://$PROJECT_DIR$/login-service-netty" />
     <file type="web" url="file://$PROJECT_DIR$/password-cracker" />
     <file type="web" url="file://$PROJECT_DIR$/pw-cracker" />
   </component>

