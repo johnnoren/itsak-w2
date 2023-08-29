@@ -1,6 +1,5 @@
 package login.service.netty;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
@@ -17,7 +16,6 @@ public class NettyServer {
 	private final int port;
 	private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 	private final String correctPassword = passwordEncoder.encode("!a");
-	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	public NettyServer(int port) {
 		this.port = port;
@@ -40,10 +38,10 @@ public class NettyServer {
 								protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest req) throws Exception {
 									ByteBuf content = req.content();
 									String jsonString = content.toString(CharsetUtil.UTF_8);
-									User user = objectMapper.readValue(jsonString, User.class);
+									var password = extractPassword(jsonString);
 
 									FullHttpResponse response;
-									if (passwordEncoder.matches(user.getPassword(), correctPassword)) {
+									if (passwordEncoder.matches(password, correctPassword)) {
 										response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
 										response.content().writeBytes(("Login successful").getBytes(CharsetUtil.UTF_8));
 									} else {
@@ -65,29 +63,22 @@ public class NettyServer {
 		}
 	}
 
+	private String extractPassword(String json) {
+		int startIdx = json.indexOf("\"password\":");
+		if (startIdx != -1) {
+			startIdx = json.indexOf("\"", startIdx + 11) + 1;
+			int endIdx = json.indexOf("\"", startIdx);
+			if (endIdx != -1) {
+				return json.substring(startIdx, endIdx);
+			}
+		} else {
+			throw new RuntimeException("No password found");
+		}
+		return null;
+	}
+
 	public static void main(String[] args) throws Exception {
 		new NettyServer(8080).start();
 	}
 
-}
-
-class User {
-	private String username;
-	private String password;
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
 }
