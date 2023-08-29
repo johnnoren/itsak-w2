@@ -32,8 +32,6 @@ dependencies {
     // Apache Commons Logging
     implementation("commons-logging:commons-logging:1.2")
 
-    // Jackson for JSON processing
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.12.3")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
