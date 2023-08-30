@@ -25,7 +25,8 @@ public class LoginController {
     public LoginController() {
         this.passwordEncoder = new BCryptPasswordEncoder();
         this.correctPassword = passwordEncoder.encode("A");
-        Bandwidth limit = Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(1)));
+        // Bandwidth limit = Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(1)));
+        Bandwidth limit = Bandwidth.classic(5, Refill.intervally(5, Duration.ofMinutes(1)));
         this.bucket = Bucket4j.builder()
                 .addLimit(limit)
                 .build();
