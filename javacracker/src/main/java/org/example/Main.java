@@ -6,7 +6,8 @@ public class Main {
         PwCracker pwCracker = new BlockingQueueHttpPwCracker();
         //String password = "ab!";
 
-        System.out.println(pwCracker.crack(3, "http://localhost:8080/nocrypt"));
+        //System.out.println(pwCracker.crack(3, "http://localhost:8080/nocrypt"));
+        System.out.println(pwCracker.crack(1, "http://localhost:8080/login"));
 
 
     }

@@ -18,14 +18,14 @@ public class LoginController {
 
     private final String correctPassword;
     private final PasswordEncoder passwordEncoder;
-    private final String unencryptedPassword = "A";
+    private final String unencryptedPassword = "z";
 
     private final Bucket bucket;
 
     public LoginController() {
         this.passwordEncoder = new BCryptPasswordEncoder();
-        this.correctPassword = passwordEncoder.encode("abc");
-        Bandwidth limit = Bandwidth.classic(100, Refill.greedy(100, Duration.ofMinutes(1)));
+        this.correctPassword = passwordEncoder.encode("A");
+        Bandwidth limit = Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(1)));
         this.bucket = Bucket4j.builder()
                 .addLimit(limit)
                 .build();
