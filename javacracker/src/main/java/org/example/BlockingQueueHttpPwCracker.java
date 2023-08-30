@@ -19,15 +19,18 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
     private final HttpClient httpClient;
     private final BlockingQueue<String> queue;
 
+
     public BlockingQueueHttpPwCracker() {
         this.httpClient = HttpClient.newHttpClient();
-        this.queue = new LinkedBlockingQueue<>();
+        this.queue = new LinkedBlockingQueue<>(1000);
     }
 
     private String recursiveCombinationFinder(BlockingQueue<String> queue, int maxLength, int currentLength, byte[] currentPassword) {
         if (currentLength == maxLength) {
             try {
                 queue.put(new String(currentPassword));
+
+                System.out.println("Elements in queue: " + queue.size());
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -57,7 +60,7 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
                 byte[] passwordBytes = new byte[length];
                 recursiveCombinationFinder(queue, length, 0, passwordBytes);
             }
-            return "Not found";
+            System.out.println("Queue filled");
         });
 
         for (int i = 0; i < numberOfCores; i++) {
