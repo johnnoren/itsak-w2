@@ -11,19 +11,26 @@ import io.netty.util.CharsetUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class NettyServer {
 
 	private final int port;
-	private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-	private final String correctPassword = passwordEncoder.encode("!a");
+	private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(8);
+	private final String correctPassword = passwordEncoder.encode("!aa");
 
 	public NettyServer(int port) {
 		this.port = port;
 	}
 
+	private static final Logger logger = Logger.getLogger(NettyServer.class.getName());
+
 	public void start() throws Exception {
 		EventLoopGroup bossGroup = new NioEventLoopGroup();
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
+		logger.log(Level.INFO, "Server started on port: " + port);
+
 		try {
 			ServerBootstrap bootstrap = new ServerBootstrap()
 					.group(bossGroup, workerGroup)

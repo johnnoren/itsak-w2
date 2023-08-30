@@ -19,12 +19,15 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
     private final HttpClient httpClient;
     private final BlockingQueue<String> queue;
 
+    public int iterations = 0;
+
     public BlockingQueueHttpPwCracker() {
         this.httpClient = HttpClient.newHttpClient();
         this.queue = new LinkedBlockingQueue<>();
     }
 
     private String recursiveCombinationFinder(BlockingQueue<String> queue, int maxLength, int currentLength, byte[] currentPassword) {
+        iterations++;
         if (currentLength == maxLength) {
             try {
                 queue.put(new String(currentPassword));
@@ -51,6 +54,7 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
     public String crack(int maxLength, String url) {
         int numberOfCores = Runtime.getRuntime().availableProcessors();
         ExecutorService executor = Executors.newFixedThreadPool(numberOfCores - 1);
+        System.out.println("Number of cores: " + numberOfCores);
 
         executor.submit(() -> {
             for (int length = 1; length <= maxLength; length++) {
@@ -78,6 +82,7 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
                         if (response.statusCode() == 200) {
                             System.out.println("Password found: " + passWordToTry);
                             System.out.println("Time: " + start.until(LocalTime.now(), ChronoUnit.SECONDS) + " seconds");
+                            System.out.println("Number of variants tested: "+ iterations);
                             executor.shutdownNow();
                             return passWordToTry;
                         }
