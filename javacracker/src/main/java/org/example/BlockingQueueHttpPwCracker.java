@@ -65,7 +65,7 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
             }
         });
 
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < numberOfCores; i++) {
 
             executor.submit(() -> {
                 LocalTime start = LocalTime.now();
