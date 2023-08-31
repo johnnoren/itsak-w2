@@ -7,7 +7,7 @@ public class Main {
         //String password = "ab!";
 
         //System.out.println(pwCracker.crack(3, "http://localhost:8080/nocrypt"));
-        System.out.println(pwCracker.crack(1, "http://localhost:8080/login"));
+        System.out.println(pwCracker.crack(2, "http://localhost:8080/login"));
 
 
     }

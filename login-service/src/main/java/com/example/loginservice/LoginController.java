@@ -18,18 +18,21 @@ public class LoginController {
 
     private final String correctPassword;
     private final PasswordEncoder passwordEncoder;
-    private final String unencryptedPassword = "z";
+    private final String unencryptedPassword = "aa";
 
     private final Bucket bucket;
 
+    public int counter = 0;
+
     public LoginController() {
         this.passwordEncoder = new BCryptPasswordEncoder();
-        this.correctPassword = passwordEncoder.encode("A");
-        // Bandwidth limit = Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(1)));
-        Bandwidth limit = Bandwidth.classic(5, Refill.intervally(5, Duration.ofMinutes(1)));
+        this.correctPassword = passwordEncoder.encode("T");
+        //Bandwidth limit = Bandwidth.classic(50, Refill.greedy(50, Duration.ofSeconds(10)));
+        Bandwidth limit = Bandwidth.classic(20, Refill.intervally(20, Duration.ofSeconds(10)));
         this.bucket = Bucket4j.builder()
                 .addLimit(limit)
                 .build();
+
     }
 
     @GetMapping("/test")
@@ -39,14 +42,17 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody User user) {
-        if (bucket.tryConsume(1)) {
+        System.out.println("Request No: "+ counter++);
+       if (bucket.tryConsume(1)) {
             if (passwordEncoder.matches(user.getPassword(), correctPassword)) {
                 return new ResponseEntity<>("Login successful for " + user.getUsername(), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("Validation failed for " + user.getUsername(), HttpStatus.FORBIDDEN);
             }
         }
-        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
+
+     return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS);
+
     }
 
     @PostMapping("/nocrypt")

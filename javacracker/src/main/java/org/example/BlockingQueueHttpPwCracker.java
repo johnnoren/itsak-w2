@@ -1,7 +1,10 @@
 package org.example;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -13,6 +16,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
+
 public class BlockingQueueHttpPwCracker implements PwCracker {
 
 
@@ -20,6 +25,7 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
     private final BlockingQueue<String> queue;
 
     public int iterations = 0;
+    public int connections = 0;
 
     public BlockingQueueHttpPwCracker() {
         this.httpClient = HttpClient.newHttpClient();
@@ -28,6 +34,7 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
 
     private String recursiveCombinationFinder(BlockingQueue<String> queue, int maxLength, int currentLength, byte[] currentPassword) {
         iterations++;
+        //System.out.println("Cracker iterations: "+ iterations);
         if (currentLength == maxLength) {
             try {
                 queue.put(new String(currentPassword));
@@ -72,6 +79,8 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
                 String passWordToTry;
                 while(true) {
                     passWordToTry = queue.take();
+                     boolean success = false;
+                     while(!success) {
                     try {
                         HttpRequest request = HttpRequest.newBuilder()
                                 .uri(new URI(url))
@@ -86,11 +95,22 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
                             executor.shutdownNow();
                             return passWordToTry;
                         }
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
+                         //System.out.println("Connections: " + connections++);
+
+                        if (response.statusCode() == 429) {
+                            //System.out.println("Too many requests");
+                            Thread.sleep(1000);
+                        }
+                        if (response.statusCode() == 403)  {
+                            success = true;
+                        }
+
+                    }
+                    catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
-
             });
         }
 
