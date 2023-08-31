@@ -16,7 +16,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 public class BlockingQueueHttpPwCracker implements PwCracker {
 
@@ -34,7 +33,6 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
 
     private String recursiveCombinationFinder(BlockingQueue<String> queue, int maxLength, int currentLength, byte[] currentPassword) {
         iterations++;
-        //System.out.println("Cracker iterations: "+ iterations);
         if (currentLength == maxLength) {
             try {
                 queue.put(new String(currentPassword));
@@ -95,16 +93,12 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
                             executor.shutdownNow();
                             return passWordToTry;
                         }
-                         //System.out.println("Connections: " + connections++);
-
                         if (response.statusCode() == 429) {
-                            //System.out.println("Too many requests");
                             Thread.sleep(1000);
                         }
                         if (response.statusCode() == 403)  {
                             success = true;
                         }
-
                     }
                     catch (Exception e) {
                             throw new RuntimeException(e);
