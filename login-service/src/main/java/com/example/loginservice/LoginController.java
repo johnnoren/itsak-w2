@@ -12,7 +12,7 @@ public class LoginController {
 
     private final String correctPassword;
     private final PasswordEncoder passwordEncoder;
-    private final String unencryptedPassword = "X4y!";
+    private final String unencryptedPassword = "4R8";
 
     public LoginController() {
         this.passwordEncoder = new BCryptPasswordEncoder();

