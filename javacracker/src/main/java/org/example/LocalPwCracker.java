@@ -1,24 +1,29 @@
 package org.example;
 
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
 public class LocalPwCracker implements PwCracker {
 
+    private final byte fromChar;
+    private final byte toChar;
 
+    public LocalPwCracker(byte fromChar, byte toChar) {
+        this.fromChar = fromChar;
+        this.toChar = toChar;
+    }
 
-    private String recursiveCracker(String correctString, int maxLength, int currentLength, byte[] currentPassword) {
+    private byte[] recursiveCracker(byte[] correctByteArray, int maxLength, int currentLength, byte[] currentByteArray) {
+
         if (currentLength == maxLength) {
-            if (Arrays.equals(currentPassword, correctString.getBytes())) {
-                return new String(currentPassword);
+            if (Arrays.equals(currentByteArray, correctByteArray)) {
+                return currentByteArray;
             }
             return null;
         }
 
-        for (int i = 33; i < 126; i++) {
-            currentPassword[currentLength] = (byte) i;
-            String result = recursiveCracker(correctString, maxLength, currentLength + 1, currentPassword);
+        for (byte i = this.fromChar; i <= this.toChar; i++) {
+            currentByteArray[currentLength] = i;
+            byte[] result = recursiveCracker(correctByteArray, maxLength, currentLength + 1, currentByteArray);
             if (result != null) {
                 return result;
             }
@@ -29,15 +34,15 @@ public class LocalPwCracker implements PwCracker {
 
     public String crack(int maxLength, String correctString) {
 
-        LocalTime start = LocalTime.now();
+        System.out.println("Cracking...");
+
+        byte[] correctByteArray = correctString.getBytes();
 
         for (int length = 1; length <= maxLength; length++) {
-            byte[] passwordBytes = new byte[length];
-            String result = recursiveCracker(correctString, length, 0, passwordBytes);
+            byte[] currentByteArray = new byte[length];
+            byte[] result = recursiveCracker(correctByteArray, length, 0, currentByteArray);
             if (result != null) {
-                LocalTime end = LocalTime.now();
-                System.out.println(start.until(end, ChronoUnit.SECONDS) + " seconds");
-                return result;
+                return new String(result);
             }
         }
         return "Not found";
